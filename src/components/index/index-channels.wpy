@@ -1,0 +1,57 @@
+<style>
+
+  .m-menu {
+    display: flex;
+    height: 181rpx;
+    width: 750rpx;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #fff;
+  }
+
+  .m-menu .item {
+    flex: 1;
+    display: block;
+    padding: 20rpx 0;
+  }
+
+  .m-menu image {
+    display: block;
+    width: 58rpx;
+    height: 58rpx;
+    margin: 0 auto;
+    margin-bottom: 12rpx;
+  }
+
+  .m-menu text {
+    display: block;
+    font-size: 24rpx;
+    text-align: center;
+    margin: 0 auto;
+    line-height: 1;
+    color: #333;
+  }
+</style>
+
+<template>
+  <view class="m-menu">
+    <navigator wx:for="{{channels}}" class="item" url="{{item.url}}" wx:key="{{item.id}}">
+      <image src="{{item.icon_url}}" background-size="cover"></image>
+      <text>{{item.name}}</text>
+    </navigator>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+  export default class IndexChannels extends wepy.component{
+    props= {
+      channels: {
+        type: Array,
+        twoWay: false
+      }
+    }
+  }
+</script>

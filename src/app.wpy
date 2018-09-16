@@ -1,0 +1,117 @@
+<style>
+  .container {
+    box-sizing: border-box;
+    background-color: #f4f4f4;
+    font-family: PingFangSC-Light,helvetica,'Heiti SC';
+  }
+
+  view,image,text,navigator{
+    box-sizing: border-box;
+    padding:0;
+    margin:0;
+
+  }
+
+  view,text{
+    font-family: PingFangSC-Light,helvetica,'Heiti SC';
+    font-size: 29rpx;
+    color: #333;
+  }
+</style>
+
+<script>
+  /* eslint-disable no-undef,no-unused-vars */
+
+  import wepy from 'wepy'
+  import 'wepy-async-function'
+  // import user from './services/user.js'
+  // import util from './utils/util.js';
+  // import api from './config/api.js';
+  // import Promise from 'promise-polyfill'
+
+  export default class extends wepy.app {
+    config = {
+      pages: [
+        'pages/index',
+        'pages/catalog',
+        'pages/topicDetail',
+        'pages/category',
+        'pages/brandDetail',
+        'pages/product',
+        'pages/cart',
+        'pages/userCenter',
+      ],
+      'window': {
+        'backgroundTextStyle': 'dark',
+        'navigationBarBackgroundColor': '#fff',
+        'navigationBarTitleText': '仿网易严选',
+        'navigationBarTextStyle': 'black',
+        'enablePullDownRefresh': true
+      },
+      'tabBar': {
+        'backgroundColor': '#fafafa',
+        'borderStyle': 'white',
+        'selectedColor': '#b4282d',
+        'color': '#666',
+        'list': [
+          {
+            'pagePath': 'pages/index',
+            'iconPath': 'static/images/ic_menu_choice_nor.png',
+            'selectedIconPath': 'static/images/ic_menu_choice_pressed.png',
+            'text': '首页'
+          },
+          {
+            'pagePath': 'pages/topicDetail',
+            'iconPath': 'static/images/ic_menu_topic_nor.png',
+            'selectedIconPath': 'static/images/ic_menu_topic_pressed.png',
+            'text': '专题'
+          },
+          {
+            'pagePath': 'pages/catalog',
+            'iconPath': 'static/images/ic_menu_sort_nor.png',
+            'selectedIconPath': 'static/images/ic_menu_sort_pressed.png',
+            'text': '分类'
+          },
+          {
+            'pagePath': 'pages/cart',
+            'iconPath': 'static/images/ic_menu_shoping_nor.png',
+            'selectedIconPath': 'static/images/ic_menu_shoping_pressed.png',
+            'text': '购物车'
+          },
+          {
+            'pagePath': 'pages/userCenter',
+            'iconPath': 'static/images/ic_menu_me_nor.png',
+            'selectedIconPath': 'static/images/ic_menu_me_pressed.png',
+            'text': '我的'
+          }
+        ]
+      },
+      'networkTimeout': {
+        'request': 10000,
+        'downloadFile': 10000
+      },
+      'debug': true
+    }
+
+    globalData = {
+      userInfo: null
+    }
+
+    constructor() {
+      super()
+      this.use('requestfix')
+      this.use('promisify')
+    }
+
+    onLaunch() {
+      // 获取用户的登录信息
+      // user.checkLogin().then(res => {
+      //   console.log('app login')
+      //   this.globalData.userInfo = wx.getStorageSync('userInfo')
+      //   this.globalData.token = wx.getStorageSync('token')
+      // }).catch(() => {
+      //
+      // })
+    }
+  }
+</script>

@@ -1,0 +1,168 @@
+<style lang="css">
+  /**index页面中多个子组件的共用样式**/
+  .a-section {
+    width: 750rpx;
+    height: auto;
+    overflow: hidden;
+    background: #fff;
+    color: #333;
+    margin-top: 20rpx;
+  }
+
+  .a-section .h {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: center;
+    height: 130rpx;
+  }
+
+  .a-section .h .txt {
+    padding-right: 30rpx;
+    background: url("http://ac-3yr0g9cz.clouddn.com/2cdba05369e10f934e54.png") right 4rpx no-repeat;
+    background-size: 16.656rpx 27rpx;
+    display: inline-block;
+    height: 36rpx;
+    font-size: 33rpx;
+    line-height: 36rpx;
+  }
+
+</style>
+
+<template>
+  <view class="container">
+    <!--banners 组件-->
+    <IndexSwiper :banners.sync="banners"></IndexSwiper>
+    <!--channels频道 组件-->
+    <IndexChannels :channels.sync="channels"></IndexChannels>
+    <!--品牌制造商列表 组件-->
+    <IndexBrands :brands.sync="brands"></IndexBrands>
+    <!--新品推荐列表 组件-->
+    <IndexNew :newProducts.sync="newProducts"></IndexNew>
+    <!--人气推荐列表 组件-->
+    <IndexHot :hotProducts.sync="hotProducts"></IndexHot>
+    <!--专题精选列表 组件-->
+    <IndexTopics :topics.sync="topics"></IndexTopics>
+    <!--分类优品列表 组件-->
+    <IndexCates :cates.sync="cates"></IndexCates>
+  </view>
+</template>
+
+<script>
+  // import {request} from '../utils/util'
+  // import api from '../config/api'
+  import wepy from 'wepy'
+  import Fly from 'flyio/dist/npm/wx'
+  import gql from '../config/gql'
+  import IndexSwiper from '../components/index/index-swiper'
+  import IndexChannels from '../components/index/index-channels'
+  import IndexBrands from '../components/index/index-brands'
+  import IndexNew from '../components/index/index-new'
+  import IndexHot from '../components/index/index-hot'
+  import IndexTopics from '../components/index/index-topics'
+  import IndexCates from '../components/index/index-cates'
+
+  export default class Index extends wepy.page {
+    constructor(props) {
+      super(props)
+      this.fly = new Fly
+      //添加拦截器
+      this.fly.interceptors.request.use((config, promise) => {
+        //给所有请求添加自定义header
+        config.headers["authorization"] = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InNlcnZpY2UiOiJwcmlzbWEtZGVtb0BkZXYiLCJyb2xlcyI6WyJhZG1pbiJdfSwiaWF0IjoxNTI0ODI5MTY0LCJleHAiOjE1MjU0MzM5NjR9.AuSUr1qeADdnkqYi2GYkpEwKPbb3g9s670Jo37yHrJE";
+        return config;
+      })
+    }
+
+    config = {
+      navigationBarTitleText: 'hellozs'
+    }
+
+    components = {
+      IndexSwiper,
+      IndexChannels,
+      IndexBrands,
+      IndexNew,
+      IndexHot,
+      IndexTopics,
+      IndexCates,
+    }
+
+    data = {
+      newProducts: [],
+      hotProducts: [],
+      topics: [],
+      brands: [],
+      cates: [],
+      banners: [],
+      channels: []
+    }
+
+    async getIndexData() {
+      try {
+        const {data: {data: {adPosition: {ads: banners}}}} = await this.fly.post(gql.baseUrl, gql.index.banners)
+        const {data: {data: {channels}}} = await this.fly.post(gql.baseUrl, gql.index.channels)
+        const {data: {data: {products: newProducts}}} = await this.fly.post(gql.baseUrl, gql.index.newProducts)
+        const {data: {data: {products: hotProducts}}} = await this.fly.post(gql.baseUrl, gql.index.hotProducts)
+        const {data: {data: {brands}}}  = await this.fly.post(gql.baseUrl, gql.index.brands)
+        const {data: {data: {topics}}}  = await this.fly.post(gql.baseUrl, gql.index.topics)
+        const rowCates  = await this.fly.post(gql.baseUrl, gql.index.cates)
+        this.banners = banners
+        this.channels = channels
+        this.brands = brands
+        this.newProducts = newProducts
+        this.hotProducts = hotProducts
+        this.topics = topics
+        this.cates = this.transformCatesList(rowCates.data.data)
+        this.$apply()
+      }catch(e) {
+        //
+        console.log(e)
+      }
+      // console.log(rowCates)
+
+    //   console.log(this.cates)
+    //   try {
+    //     const res = await request(api.IndexUrl)
+    //     console.log(res.data)
+    //     if (res.errno === 0) {
+    //       this.banners = res.data.banner
+    //       this.channels = res.data.channel
+    //       this.newProducts = res.data.newGoodsList
+    //       this.hotProducts = res.data.hotGoodsList
+    //       this.brands = res.data.brandList
+    //       this.topics = res.data.topicList
+    //
+    //       this.cates = res.data.categoryList
+    //       this.$apply()
+    //     }
+    //   } catch (err) {
+    //     console.log(err)
+    //   } finally {
+    //     this.$apply()
+    //   }
+    }
+
+    transformCatesList = (list) => {
+      return list.categories.map(category => {
+        let goodsList = []
+        category.subs.forEach(sub => {
+          sub.products.forEach(product => {
+            if(goodsList.length < 3) {
+              goodsList.push(product)
+            }
+          })
+        })
+        return {
+          id: category.code,
+          name: category.name,
+          goodsList
+        }
+      })
+    }
+
+    onLoad = () => {
+      this.getIndexData()
+    }
+  }
+</script>
